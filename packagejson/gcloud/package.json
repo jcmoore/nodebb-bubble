@@ -1,0 +1,8 @@
+{
+	"scripts": {
+    "":""
+    , "deploy.dev": "(cd ../.. && gcloud preview app deploy app.dev.yaml)"
+    , "deploy.prod": "(cd ../.. && gcloud preview app deploy app.prod.yaml)"
+
+  }
+}

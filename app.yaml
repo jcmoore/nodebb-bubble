@@ -1,0 +1,14 @@
+runtime: custom
+vm: true
+threadsafe: true
+service: default
+api_version: 1
+
+handlers:
+- url: /.*
+  script: IGNORED
+  secure: always
+
+env_variables:
+# https://cloud.google.com/compute/docs/storing-retrieving-metadata#projectwide
+  GAE_NODEBB_CONFIG_METADATA_KEY: "!!!!!   PUT GCLOUD METADATA KEY HERE !!!!!"

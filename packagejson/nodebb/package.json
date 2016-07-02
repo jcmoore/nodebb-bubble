@@ -1,0 +1,10 @@
+{
+	"scripts": {
+    "":""
+    , "prep": "mkdir -p ../../vendor/nodebb && npm run gather && npm run pare && npm run api"
+		, "gather": "curl -L https://github.com/NodeBB/NodeBB/archive/v1.0.4-auto.10.tar.gz | tar -xz -C ../../vendor/nodebb --strip 1"
+		, "pare": "(cd ../../vendor/nodebb && (npm install --unsafe-perm || ((if [ -f npm-debug.log ]; then cat npm-debug.log; fi) && false)))"
+		, "api": "(cd ../../vendor/nodebb && (npm install --unsafe-perm nodebb-plugin-write-api))"
+
+  }
+}

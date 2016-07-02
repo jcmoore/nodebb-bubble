@@ -1,0 +1,9 @@
+{
+  "description": "should be ignored by docker",
+	"scripts": {
+    "":""
+    , "docker.build": "docker build -t jcmoore/nodebb-bubble:0.0.1-gae ../.."
+    , "docker.run": "docker run --rm --name nodebb -it -p 8080:8080 -v $PWD/../../../nodebb.config.json:/app/vendor/nodebb/config.json jcmoore/nodebb-bubble:0.0.1-gae"
+    , "docker.exec": "docker exec -it nodebb"
+	}
+}

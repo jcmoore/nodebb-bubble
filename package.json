@@ -1,0 +1,17 @@
+{
+	"name": "nodebb-bubble",
+	"version": "0.0.0",
+	"scripts": {
+    "":""
+    , "start": "node src/nodebb-bubble-proxy.js"
+
+    , "nodebb": "npm run setup && npm run serve && (cd ./vendor/nodebb && ./nodebb log)"
+    , "serve": "(cd ./vendor/nodebb && port=$PORT_NODEBB ./nodebb start)"
+    , "setup": "npm run meta && yes '' | ./vendor/nodebb/nodebb setup"
+		, "meta": "test -f ./vendor/nodebb/config.json || curl -o ./vendor/nodebb/config.json http://metadata.google.internal/computeMetadata/v1/project/attributes/$GAE_NODEBB_CONFIG_METADATA_KEY -H 'Metadata-Flavor: Google'"
+
+	},
+	"dependencies": {
+		"http-proxy": "1.14.0"
+	}
+}
