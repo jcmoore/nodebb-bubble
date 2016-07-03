@@ -9,6 +9,12 @@ handlers:
   script: IGNORED
   secure: always
 
+network:
+  instance_tag: websocketed
+  name: default
+
 env_variables:
 # https://cloud.google.com/compute/docs/storing-retrieving-metadata#projectwide
-  GAE_NODEBB_CONFIG_METADATA_KEY: "!!!!!   PUT GCLOUD METADATA KEY HERE !!!!!"
+  GAE_NODEBB_CONFIG_METADATA_KEY:
+  PORT_NODEBB: 4567
+  IS_APP_ENGINE: true

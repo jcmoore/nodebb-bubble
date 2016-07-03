@@ -1,0 +1,7 @@
+{
+  "header": "Metadata-Flavor: Google"
+  , "attr_instance": "?gae_backend_instance"
+  , "attr_version": "?gae_backend_version"
+  , "attr_service": "?gae_backend_name"
+  , "attr_project": "?gae_project"
+}

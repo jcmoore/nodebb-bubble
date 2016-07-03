@@ -3,15 +3,25 @@
 	"version": "0.0.0",
 	"scripts": {
     "":""
-    , "start": "node src/nodebb-bubble-proxy.js"
+    , "start": "npm run nodebb && npm run attrs && node src/nodebb-bubble-proxy.js"
 
-    , "nodebb": "npm run setup && npm run serve && (cd ./vendor/nodebb && ./nodebb log)"
+    , "nodebb.log": "npm run nodebb && (cd ./vendor/nodebb && ./nodebb log)"
+    , "nodebb": "npm run data && npm run store && npm run serve"
+    , "setup": "(cd ./vendor/nodebb && yes '' | ./nodebb setup) && npm run store"
     , "serve": "(cd ./vendor/nodebb && port=$PORT_NODEBB ./nodebb start)"
-    , "setup": "npm run meta && yes '' | ./vendor/nodebb/nodebb setup"
-		, "meta": "test -f ./vendor/nodebb/config.json || curl -o ./vendor/nodebb/config.json http://metadata.google.internal/computeMetadata/v1/project/attributes/$GAE_NODEBB_CONFIG_METADATA_KEY -H 'Metadata-Flavor: Google'"
+    , "data" : "test -f ./vendor/nodebb/config.backup.json || npm run meta"
+		, "meta": "curl -o ./vendor/nodebb/config.backup.json http://metadata.google.internal/computeMetadata/v1/project/attributes/$GAE_NODEBB_CONFIG_METADATA_KEY -H 'Metadata-Flavor: Google'"
+    , "patch": "sed -i s#://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip#://$(curl http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip -H 'Metadata-Flavor: Google')# ./vendor/nodebb/config.backup.json"
+    , "store": "cp ./vendor/nodebb/config.backup.json ./vendor/nodebb/config.json"
 
+    , "attrs": "npm run attr.instance && npm run attr.version && npm run attr.service && npm run attr.project"
+    , "attr.instance": "test $IS_APP_ENGINE && sed -i s#?gae_backend_instance#$(curl -s -H 'Metadata-Flavor: Google' http://metadata.google.internal/computeMetadata/v1/instance/attributes/gae_backend_instance)# ./src/metadata.json || echo skip attr.instance"
+    , "attr.version": "test $IS_APP_ENGINE && sed -i s#?gae_backend_version#$(curl -s -H 'Metadata-Flavor: Google' http://metadata.google.internal/computeMetadata/v1/instance/attributes/gae_backend_version)# ./src/metadata.json || echo skip attr.version"
+    , "attr.service": "test $IS_APP_ENGINE && sed -i s#?gae_backend_name#$(curl -s -H 'Metadata-Flavor: Google' http://metadata.google.internal/computeMetadata/v1/instance/attributes/gae_backend_name)# ./src/metadata.json || echo skip attr.service"
+    , "attr.project": "test $IS_APP_ENGINE && sed -i s#?gae_project#$(curl -s -H 'Metadata-Flavor: Google' http://metadata.google.internal/computeMetadata/v1/instance/attributes/gae_project)# ./src/metadata.json || echo skip attr.project"
 	},
 	"dependencies": {
-		"http-proxy": "1.14.0"
+		"http-proxy": "1.14.0",
+    "ws": "1.1.1"
 	}
 }

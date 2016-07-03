@@ -16,5 +16,6 @@ RUN npm install --unsafe-perm || \
       cat npm-debug.log; \
     fi) && false)
 COPY . /app/
-COPY ./package.json /app/package.json.main
-CMD npm run nodebb
+ENV PORT_NODEBB=4567
+CMD npm run start
+#CMD npm run nodebb.log
