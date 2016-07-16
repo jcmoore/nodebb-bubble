@@ -2,7 +2,7 @@
 	"scripts": {
     "":""
     , "deploy.dev": "(cd ../.. && gcloud preview app deploy app.dev.yaml)"
-    , "deploy.prod": "(cd ../.. && gcloud preview app deploy app.prod.yaml)"
+    , "deploy.prod": "(cd ../.. && gcloud preview app deploy app.prod.yaml --verbosity debug)"
     , "setup.firewall": "gcloud compute --project 'space-hq' firewall-rules create 'nodebb-allow-websocket' --allow tcp:$PORT_NODEBB --description 'nodebb/socket.io/engine.io benefits from websockets' --network 'default' --source-ranges '0.0.0.0/0' --target-tags 'websocketed'"
 
   }

@@ -49,16 +49,23 @@ var server = http.createServer(function(req, res) {
   var pathify = (req.headers["x-pathify-query"] || "").trim();
 
   if (req.url.indexOf("/_ah/") === 0) {
-    res.writeHead(404, {});
-    return res.end("");
+    if (req.url === "/_ah/health" ||
+       req.url === "/_ah/health/") {
+      return proxy.web(req, res, {
+        target: hostSpeak+"/api/",
+      });
+    } else {
+      res.writeHead(404, {});
+      return res.end("");
+    }
   } else if (pathify) {
     target += rewriteRequestPathUsingQueryParams(req.url, pathify.split(/\s*,\s*/g));
-  } else if (req.url.indexOf("/api/") !== 0) {
+  } else if (req.url.search(/^\/(api|uploads)\//) !== 0) {
     if (endpoint &&
         (req.headers.host || "").split(dot).length < 4) {
       // redirect
       res.writeHead(301, {
-        Location: endpoint
+        Location: endpoint+req.url,
       });
 
       return res.end();

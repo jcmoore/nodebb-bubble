@@ -18,9 +18,9 @@ npm-debug.log
 .git
 .hg
 .svn
-packagejson/docker
-packagejson/gcloud
-vendor
+/packagejson/docker
+/packagejson/gcloud
+/vendor
 app.yaml
 app.*.yaml
 .gitignore
