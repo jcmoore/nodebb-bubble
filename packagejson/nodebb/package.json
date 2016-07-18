@@ -4,7 +4,7 @@
     , "prep": "mkdir -p ../../vendor/nodebb && npm run gather && npm run pare && npm run api && npm run gcs"
 		, "gather": "curl -L https://github.com/NodeBB/NodeBB/archive/v1.0.3.tar.gz | tar -xz -C ../../vendor/nodebb --strip 1"
 		, "pare": "(cd ../../vendor/nodebb && (npm install --unsafe-perm || ((if [ -f npm-debug.log ]; then cat npm-debug.log; fi) && false)))"
-		, "api": "(cd ../../vendor/nodebb && (npm install --unsafe-perm nodebb-plugin-write-api))"
+		, "api": "(cd ../../vendor/nodebb && (npm install --unsafe-perm jcmoore/nodebb-plugin-write-api#2d7e5e34c7dad39c3dd22769fde787705bdebcb9))"
     , "gcs": "(cd ../../vendor/nodebb && (npm install --unsafe-perm jcmoore/nodebb-plugin-gcloud-storage-uploads#3870cf729f0e1d1e944904699a33eda8e4775562))"
 
   }

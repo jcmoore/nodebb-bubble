@@ -1,5 +1,6 @@
 var url = require('url'),
     http = require('http'),
+    stream = require('stream'),
     httpProxy = require('http-proxy'),
     WebSocketServer = require('ws').Server;
 
@@ -46,7 +47,8 @@ var server = http.createServer(function(req, res) {
   // and then proxy the request.
 
   var target = hostSpeak;
-  var pathify = (req.headers["x-pathify-query"] || "").trim();
+  var bodify = (req.headers["x-bodify-headers"] || "").trim();
+  var pathify = (req.headers["x-pathify-params"] || "").trim();
 
   if (req.url.indexOf("/_ah/") === 0) {
     if (req.url === "/_ah/health" ||
@@ -58,8 +60,14 @@ var server = http.createServer(function(req, res) {
       res.writeHead(404, {});
       return res.end("");
     }
-  } else if (pathify) {
-    target += rewriteRequestPathUsingQueryParams(req.url, pathify.split(/\s*,\s*/g));
+  } else if (pathify || bodify) {
+    if (pathify) {
+      target += rewriteRequestPathUsingQueryParams(req.url, pathify.split(/\s*,\s*/g));
+    }
+
+    if (bodify) {
+      return handleRequestBodyProxy(req, res, target, bodify);
+    }
   } else if (req.url.search(/^\/(api|uploads)\//) !== 0) {
     if (endpoint &&
         (req.headers.host || "").split(dot).length < 4) {
@@ -106,14 +114,49 @@ function eachReplace (segment) {
   return this.reduce(transformSubstitue, segment);
 }
 
-function eachParamToKVP (param) {
-  return [param, this[param]];
+function eachKeyToKVP (key) {
+  return [key, this[key]];
 }
 
-function rewriteRequestPathUsingQueryParams (original, params) {
+function rewriteRequestPathUsingQueryParams (original, rewrite) {
   var parsed = url.parse(original, true);
-  var substitutes = (params.map(eachParamToKVP, parsed.query));
+  var substitutes = (rewrite.map(eachKeyToKVP, parsed.query));
   var modified = parsed.pathname.split("/").map(eachReplace, substitutes).join("/");
   parsed.pathname = modified;
   return url.format(parsed);
+}
+
+
+
+function rewriteRequestBodyUsingHeaders (original, rewrite, headers) {
+  var substitutes = (rewrite.map(eachKeyToKVP, headers));
+  var modified = substitutes.reduce(transformSubstitue, original);
+  return modified;
+}
+
+function handleRequestBodyProxy (req, res, target, bodify) {
+  var data = [];
+
+  return new Promise(function (resolve) {
+    req.on("data", function (datum) { data.push(datum); });
+    req.on("end", resolve);
+    req.on("error", resolve);
+  }).then(function (err) {
+    var original = Buffer.concat(data).toString();
+    var modified = rewriteRequestBodyUsingHeaders(original, bodify.split(/\s*,\s*/g), req.headers);
+    var buffer = new Buffer(modified);
+    var piping = new stream.PassThrough();
+    piping.end(buffer);
+
+    return proxy.web(req, res, {
+      target: target,
+      buffer: piping,
+      headers: { "Content-Length": buffer.length, },
+    });
+  }).catch(function () {
+    res.writeHead(500);
+    return res.end(JSON.stringify({
+      error: "bodify",
+    }));
+  });
 }
